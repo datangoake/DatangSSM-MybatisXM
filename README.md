@@ -1,2 +1,1 @@
-# newercode
-newer all code
+该仓库保存牛耳教育所有代码
