@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="test_myeclipse_github_0707">
-        <wb-resource deploy-path="/" source-path="/WebRoot"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <property name="context-root" value="/test_myeclipse_github_0707"/>
-        <property name="java-output-path" value="/test_myeclipse_github_0707/WebRoot/WEB-INF/classes"/>
-    </wb-module>
-</project-modules>
