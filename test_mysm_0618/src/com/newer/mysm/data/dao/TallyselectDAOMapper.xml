@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace务必与接口路径和名字相一致-->
+<mapper namespace="com.newer.mysm.data.dao.Tallyselectdao">
+
+<!-- resultMap:结果映射 -->
+  <resultMap id="tallyResultMap" type="Tally">
+	    <!-- 注意：列名和属性名必须一致，如果属性名写为列名抛出There is no setter方法错误 -->
+		<id property="tallyid" column="tallyid" />
+		<result property="type" column="type" />
+		<result property="price" column="price" />
+		<result property="payDate" column="paydate" />
+	</resultMap>
+	
+	<select id="selectall" resultMap="tallyResultMap">
+	select * from tally
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
