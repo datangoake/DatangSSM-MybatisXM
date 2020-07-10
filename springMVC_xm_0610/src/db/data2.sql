@@ -25,3 +25,16 @@ for each row
 begin
     select seq_T_PLAN.nextval into :new.PLAN_ID from dual;
 end;
+select * from t_role
+select * from(select row_number() over(order by employee_ID desc) no, e.* from T_EMPLOYEE e) temp where temp.no between 1 and 4
+select * from T_EMPLOYEE where ROLE_ID =4
+
+update t_task set assigner_id=null where assigner_Id=191
+
+
+select * from(select row_number() over(order by employee_ID desc) no, e.*,r.* from T_EMPLOYEE e join T_role r on r.role_id=e.role_id) 
+temp where temp.no between 1 and 4
+
+
+
+ select * from(select row_number() over(order by employee_ID desc) no, e.* from T_EMPLOYEE e) temp where temp.no between 1 and 4

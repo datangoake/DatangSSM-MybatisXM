@@ -30,38 +30,7 @@ public class IEmployeeControl {
 	
 	
 	
-	
-    //查询所有员工
-    @RequestMapping("admin/userdamin.do")
-	public void UserAll(Model model,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException{
-			System.out.println("启动控制器admin/userdamin.do:UserAll");
-			List<T_Employee> employees=Service.selectEmployees("select * from  t_employee", null);
-		    session.setAttribute("employeeList", employees);
-		    System.out.println("管理员为:"+employees);
-			response.sendRedirect("../admin/useradmin.jsp");
-			
-  }
-   
-   
-   @RequestMapping("admin/empdistribute.do")
-	public void empdistribute(Model model,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException{
-			System.out.println("启动控制器:empdistribute");
-			List<T_Employee> employees=Service.selectEmployees("select * from T_EMPLOYEE", new Object[]{});
-			session.setAttribute("All", employees);
-			response.sendRedirect("../admin/empdistribute.jsp");
-			
- }
-   
-   
-    @RequestMapping("admin/useradmin.do")
- 	public void useradmin(Model model,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException{
- 			System.out.println("启动控制器:useradmin");
- 			List<T_Employee> employees=Service.selectEmployees("select * from T_EMPLOYEE", new Object[]{});
- 			session.setAttribute("All", employees);
- 			System.out.println(employees);
- 			response.sendRedirect("../admin/useradmin.jsp");
- 			
-  }
+
     
 /*     //删除
      @RequestMapping("admin/delete.do")
@@ -142,7 +111,10 @@ public class IEmployeeControl {
     	 
      }
     
-    //分页处理
+    
+    
+    
+    //查询所有并分页（用户管理）
     @RequestMapping("admin/queryall.do")
 	public String query(HttpSession session,Model model,String pageNo1,String pageSize1){
     	
@@ -167,7 +139,7 @@ public class IEmployeeControl {
 		pb.setData(employees);
 		pb.setPageNo(pageNo);
 		pb.setPageSize(pageSize);
-		pb.setTotalRecords(Service.getTotalCounts("T_Employee"));
+		pb.setTotalRecords(Service.getTotalCounts());
 		//model.addAttribute("empadmin", pb);  注意使用model.addAttribute jsp取不到值
 		session.setAttribute("emps", pb);
 		
@@ -182,7 +154,7 @@ public class IEmployeeControl {
     
     
       
-       //查询所有非管理员员工
+       //查询所有非管理员员工（员工管理）
 	   @RequestMapping("admin/All.do")
 	   public String listEmployee(Model model,String pageNo1,String pageSize1,HttpSession session) {
 		    int pageNo = 1;
@@ -205,7 +177,7 @@ public class IEmployeeControl {
 			pb.setData(pbemps);
 			pb.setPageNo(pageNo);
 			pb.setPageSize(pageSize);
-			pb.setTotalRecords(Service.getTotalCountnotadmin("T_Employee"));
+			pb.setTotalRecords(Service.getTotalCountnotadmin());
 		
 			
 			session.setAttribute("empadmin", pb);
@@ -217,7 +189,7 @@ public class IEmployeeControl {
 	}
 	   
 	   
-	   //查询所有角色为员工的信息
+	   //查询所有角色为员工的信息（分配人员）
 		@RequestMapping("admin/update.do")
 		public String loader_update(Model model,String pageNo1,String pageSize1,HttpSession session){
 			
@@ -241,7 +213,7 @@ public class IEmployeeControl {
 			pb.setData(pbemps);
 			pb.setPageNo(pageNo);
 			pb.setPageSize(pageSize);
-			pb.setTotalRecords(Service.getTotalCountemp("T_Employee"));
+			pb.setTotalRecords(Service.getTotalCountemp());
 			
 			
            session.setAttribute("all", pb);
@@ -257,14 +229,18 @@ public class IEmployeeControl {
 		public String  deleteEmployee(Integer ID, String empRoleName,String empName,   HttpServletResponse response,HttpSession session) throws IOException {
 			try {
 				System.out.println("启动删除控制器");
+				System.out.println(ID);
+				System.out.println(empRoleName);
+				
 				if ("员工".equals(empRoleName)) {
-					this.Service.deleteEmployee(ID);
+					this.Service.deleteEmployeebyid(ID);
 					
 				}else {
 					// 修改任务表的assigner_id
-					this.Service.updateAssignerId(new Object[]{ID});
-					this.Service.updateEmployeeParent(new Object[]{ID} );
-					this.Service.deleteEmployee(ID);
+					System.out.println("11");
+					this.Service.updateAssignerId(ID);
+					this.Service.updateEmployeeParent(ID);
+					this.Service.deleteEmployeebyid(ID);
 				}
 				return "All.do";
 			} catch (Exception e) {

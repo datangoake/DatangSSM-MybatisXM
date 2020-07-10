@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.newer.admin.service.impl.EmployeeServiceimpl;
 import com.newer.admin.service.impl.IRoleServiceimpl;
 import com.newer.admin.web.util.EmployeeForm;
+import com.newer.admin.web.util.PageBean;
 import com.newer.common.entry.T_Employee;
 import com.newer.common.entry.T_Role;
 
@@ -63,9 +64,27 @@ public class IRoleControl {
 			emp.setRole(addForm.getRole());
 			T_Service.insertEmployee(emp);
 			//在执行一次全部查询
-			List<T_Employee> employees=T_Service.selectEmployees("select * from T_EMPLOYEE", new Object[]{});
-			session.setAttribute("All", employees);
-			 return "../admin/useradmin.jsp";
+			System.out.println("启动控制器分页");
+	    	int pageNo = 1;
+			int pageSize = 4;
+			List<T_Employee> employees=T_Service.selectbypage(pageNo, pageSize);
+			for (T_Employee t_Employee : employees) {
+				System.out.println("数据："+t_Employee.getReal_name());
+			}
+			
+			PageBean<T_Employee> pb=new PageBean<T_Employee>();
+			pb.setData(employees);
+			pb.setPageNo(pageNo);
+			pb.setPageSize(pageSize);
+			pb.setTotalRecords(T_Service.getTotalCounts());
+			//model.addAttribute("empadmin", pb);  注意使用model.addAttribute jsp取不到值
+			session.setAttribute("emps", pb);
+			
+			
+			
+			
+		
+			 return "redirect:/admin/useradmin.jsp";
 		}else {
 			//两次密码不一致错误
 			//请求范围存储失败的message

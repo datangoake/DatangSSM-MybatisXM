@@ -1,19 +1,19 @@
 package com.newer.admin.data.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.newer.admin.data.dao.IEmployeeDAO;
@@ -22,218 +22,164 @@ import com.newer.common.entry.T_Employee;
 import com.newer.common.entry.T_Role;
 
 @Component("EmployeeDaoImpl")
-public class IEmployeeDaoImpl implements IEmployeeDAO {
+public class IEmployeeDaoImpl extends SqlSessionDaoSupport implements IEmployeeDAO {
    
+	@Resource(name="sqlSessionFactory")
+	SqlSessionFactory factory;
+
+	@PostConstruct
+    private void  initialize() {
+        setSqlSessionFactory(factory);
+    }
+	
 	JdbcTemplate jdbcTemplate = new JdbcTemplate(DBUtil.getDataSource());
-	//全部查询
+	//全部查询（分页） 已完成（用户管理）
 	@Override
-	public List<T_Employee> selectEmployees(String sql, Object[] params) {
-		System.out.println("启动数据层:selectEmployees");
-		
-		return this.jdbcTemplate.query(sql, params,new RowMapper() {
-			int employee_ID;
-			String employee_name;
-			String password;
-			String real_name;
-			String sex;
-			@DateTimeFormat(pattern="yyyy-MM-dd")
-			Date birthday;
-			String duty;
-			@DateTimeFormat(pattern="yyyy-MM-dd")
-			Date enrolldate;
-			String education;
-			String major;
-			String experience;
-			T_Role role;
-			T_Employee emp;
-			@Override
-			public Object mapRow(ResultSet rs, int arg1) throws SQLException {
-				T_Employee employee=new T_Employee();
-				employee.setEmployee_ID(rs.getInt("employee_ID"));
-				employee.setEmployee_name(rs.getString("employee_name"));
-				employee.setPassword(rs.getString("password"));
-				employee.setReal_name(rs.getString("real_name"));
-				employee.setSex(rs.getString("sex"));
-				employee.setBirthday(rs.getTimestamp("birthday"));
-				employee.setDuty(rs.getString("duty"));
-				employee.setEnrolldate(rs.getTimestamp("enrolldate"));
-				employee.setEducation(rs.getString("education"));
-				employee.setMajor(rs.getString("major"));
-				employee.setExperience(rs.getString("experience"));
-				
-				employee.setRole(new IRoleDaoImpl().selectByRoleId(rs.getInt("role_ID")));
-				
-				T_Employee employee1=new T_Employee();
-				employee1.setEmployee_ID(rs.getInt("employee_ID"));
-				employee.setEmp(employee1);
-				return employee;
-			}
-		});
+	public List<T_Employee> selectbypage(Map<String,Object> param) {
+		SqlSession session=super.getSqlSession();
+		IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+		List<T_Employee> list=dao.selectbypage(param);
+		for (T_Employee t_Employee : list) {
+			T_Role role=this.getroleinfo(t_Employee.getEmployee_ID());
+			t_Employee.setRole(role);
+		}
+		return list;
+	}
+	
+	//分页 查询  查询所有非管理员员工（员工管理）
+	@Override
+	public List<T_Employee> querybypage(Map<String, Object> param) {
+		SqlSession session=super.getSqlSession();
+		IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+		List<T_Employee> list=dao.querybypage(param);
+		for (T_Employee t_Employee : list) {
+			T_Role role=this.getroleinfo(t_Employee.getEmployee_ID());
+			t_Employee.setRole(role);
+		}
+		return list;
+	}
+	@Override
+	public List<T_Employee> querybyemp(Map<String, Object> param) {
+		SqlSession session=super.getSqlSession();
+		IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+		List<T_Employee> list=dao.querybyemp(param);
+		for (T_Employee t_Employee : list) {
+			T_Role role=this.getroleinfo(t_Employee.getEmployee_ID());
+			t_Employee.setRole(role);
+		}
+		return list;
 	}
 
+	
+	
+	
+	
+	
+	
+	//获取总条数  已完成
+		@Override
+		public int getTotalCounts1() {
+			SqlSession session=super.getSqlSession();
+			IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+			return dao.getTotalCounts1();
+		}
+		//获取总条数  已完成
+				@Override
+				public int getTotalCounts2() {
+					SqlSession session=super.getSqlSession();
+					IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+					return dao.getTotalCounts2();
+				}
+				//获取总条数  已完成
+				@Override
+				public int getTotalCounts3() {
+					SqlSession session=super.getSqlSession();
+					IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+					return dao.getTotalCounts3();
+				}
+			   //按编号查询一个员工  已完成
+				@Override
+				public List<T_Employee> findEmployeeById(@Param("employeeId") Integer employeeId) {
+					System.out.println("启动数据层按编号查询一个员工:findEmployeeById");
+					SqlSession session=super.getSqlSession();
+					IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+					return dao.findEmployeeById(employeeId);
+				}
+			
+				
+				
+				
+				
 
-    //添加员工
+    //添加员工  已完成
 	@Override
 	public int insertEmployee(T_Employee employee) {
-		System.out.println("启动数据层员工添加:insertEmployee");
-		 	String sql="insert  into T_EMPLOYEE(employee_name, password, real_name, sex, birthday, duty, enrolldate, education, major, experience, role_id) values"+
-		"(?,?,?,?,?,?,?,?,?,?,?)";
-		
-		return this.jdbcTemplate.update(sql,new Object[]{
-				employee.getEmployee_name(),
-				employee.getPassword(),
-				employee.getReal_name(),
-				employee.getSex(),
-				employee.getBirthday(),
-				employee.getDuty(),
-				employee.getEnrolldate(),
-				employee.getEducation(),
-				employee.getMajor(),
-				employee.getExperience(),
-				employee.getRole().getRole_ID(),
-				
-				
-		});
-		
+		SqlSession session=super.getSqlSession();
+		IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+		return dao.insertEmployee(employee);
 	}
-   //按编号删除
-	@Override
-	public int deleteEmployee(T_Employee employee) {
-		System.out.println("启动数据层按编号删除:deleteEmployee");
-		return this.jdbcTemplate.update("delete from t_employee where employee_id=?" ,new Object[]{employee.getEmployee_ID()});
-	}
-
-   //按编号查询一个员工
-	@Override
-	public List<T_Employee> findEmployeeById(Integer employeeId) {
-		System.out.println("启动数据层按编号查询一个员工:findEmployeeById");
-		
-		return this.jdbcTemplate.query("select * from t_employee where employee_ID=?", new Object[] {employeeId}, new RowMapper(){
-
-			@Override
-			public Object mapRow(ResultSet rs, int arg1) throws SQLException {
-				T_Employee employee=new T_Employee();
-				employee.setEmployee_ID(rs.getInt("employee_ID"));
-				employee.setEmployee_name(rs.getString("employee_name"));
-				employee.setPassword(rs.getString("password"));
-				employee.setReal_name(rs.getString("real_name"));
-				employee.setSex(rs.getString("sex"));
-				employee.setBirthday(rs.getTimestamp("birthday"));
-				employee.setDuty(rs.getString("duty"));
-				employee.setEnrolldate(rs.getTimestamp("enrolldate"));
-				employee.setEducation(rs.getString("education"));
-				employee.setMajor(rs.getString("major"));
-				employee.setExperience(rs.getString("experience"));
-				
-				employee.setRole(new IRoleDaoImpl().selectByRoleId(rs.getInt("role_ID")));
-				
-				T_Employee employee1=new T_Employee();
-				employee1.setEmployee_ID(rs.getInt("employee_ID"));
-				employee.setEmp(employee1);
-				return employee;
-			}
-			
-			
-		});
-	}
-
-    //按编号修改
-	@Override
-	public int modifyEmployee(T_Employee employee) {
-		System.out.println("启动数据层按编号修改:modifyEmployee");
-		final String employeeName = employee.getEmployee_name();
-		final String password = employee.getPassword();
-		final String realName = employee.getReal_name();
-		final String sex = employee.getSex();
-		final Date birthday = employee.getBirthday();
-		final String duty = employee.getDuty();
-		final Date enrolldate = employee.getEnrolldate();
-		final String education = employee.getEducation();
-		final String major = employee.getMajor();
-		final String experience =employee.getExperience();
-		final int roleId = employee.getRole().getRole_ID();
-		Integer parentId = null;
-		if (employee.getEmp()!=null) {
-			parentId=employee.getEmp().getEmployee_ID();
-			
-		}
-		
-		return this.jdbcTemplate.update("update t_employee set employee_name=?, password=?, real_name=?, " +
-				"sex=?, birthday=?, duty=?, enrolldate=?, education=?,major=?,experience=?,role_id=?,parent_id=? where employee_id=?", new Object[]{employeeName,password,realName,sex,
-				birthday,duty,enrolldate,education,major,experience,roleId,parentId,
-				employee.getEmployee_ID()});
-		
-	}
-
-     //分页
-	@Override
-	public List<T_Employee> selectbypage(String sql, List args) {
-		System.out.println("启动数据层分页处理:selectbypage");
-		
-		return this.jdbcTemplate.query(sql, args.toArray(), new RowMapper(){
-
-			@Override
-			public Object mapRow(ResultSet rs, int arg1) throws SQLException {
-				T_Employee employee=new T_Employee();
-				employee.setEmployee_ID(rs.getInt("employee_ID"));
-				employee.setEmployee_name(rs.getString("employee_name"));
-				employee.setPassword(rs.getString("password"));
-				employee.setReal_name(rs.getString("real_name"));
-				employee.setSex(rs.getString("sex"));
-				employee.setBirthday(rs.getTimestamp("birthday"));
-				employee.setDuty(rs.getString("duty"));
-				employee.setEnrolldate(rs.getTimestamp("enrolldate"));
-				employee.setEducation(rs.getString("education"));
-				employee.setMajor(rs.getString("major"));
-				employee.setExperience(rs.getString("experience"));
-				
-				employee.setRole(new IRoleDaoImpl().selectByRoleId(rs.getInt("role_ID")));
-				
-				T_Employee employee1=new T_Employee();
-				employee1.setEmployee_ID(rs.getInt("employee_ID"));
-				employee.setEmp(employee1);
-				return employee;
-			}
-			
-			
-		});
-	}
-
-    //获取总条数
-	@Override
-	public int getTotalCounts(String sql) {
-		System.out.println("启动数据层获取总条数");
-		
-		return this.jdbcTemplate.queryForInt(sql,null);
-	}
-
-
-	@Override
-	public int modifSuperior(T_Employee id) {
-		System.out.println("启动数据层修改上级");
-		int i=0;
-		try {
-			i=jdbcTemplate.update("update t_employee set parent_id=null where employee_id=?",new Object[]{id});
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		return i;
-	}
-
+  
 	// 删除员工第二种方法
 	@Override
-	public int deleteEmployee(String sql, Object[] obj, Integer empId) {
-	    
-		return this.jdbcTemplate.update(sql, obj);
+	public int deleteEmployee(@Param("id")Integer id) {
+		SqlSession session=super.getSqlSession();
+		IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+		return dao.deleteEmployee(id);
 	}
 
-
+	
+	//  已完成
+  //按编号修改(分配员工)
 	@Override
-	public int updateEmployeeParent(String sql, Object[] obj) {
-		System.out.println("启动数据层删除主管修改下级");
-		
-		return this.jdbcTemplate.update(sql, obj);
+	public int modifyEmployee(@Param("employee")T_Employee employee) {
+		System.out.println("启动数据层按编号修改:modifyEmployee");
+		SqlSession session=super.getSqlSession();
+		IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+		return dao.modifyEmployee(employee);
 	}
+	
+	//查询所有主管  已完成
+		public List<T_Employee> queryAllManager(){
+			SqlSession session=super.getSqlSession();
+			IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+			return dao.queryAllManager();
+		}
+		
+		
+		//修改员工上级信息
+		public int modifSuperior(@Param("id")Integer id) {
+			SqlSession session=super.getSqlSession();
+			IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+			return dao.modifSuperior(id);
+		}
+		// 删除主管，修改下级v
+		@Override
+		public int updateEmployeeParent(@Param("id")Integer id) {
+			System.out.println("启动数据层删除主管修改下级");
+			SqlSession session=super.getSqlSession();
+			IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+			return dao.updateEmployeeParent(id);
+		}
+
+		//登录
+		@Override
+		public T_Employee checkLogin(T_Employee emp) {
+			SqlSession session=super.getSqlSession();
+			IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+			return dao.checkLogin(emp);
+		}
+
+		//根据用户编号查询角色
+		@Override
+		public T_Role getroleinfo(Integer id) {
+			SqlSession session=super.getSqlSession();
+			IEmployeeDAO dao=session.getMapper(IEmployeeDAO.class);
+			return dao.getroleinfo(id);
+		}
+
+
+
+
+
 	
 }

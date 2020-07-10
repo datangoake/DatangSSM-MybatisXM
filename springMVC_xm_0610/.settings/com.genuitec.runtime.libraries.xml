@@ -2,4 +2,5 @@
 <project>
   <add-on id="spring.persistence"/>
   <add-on id="spring.web"/>
+  <add-on id="spring.test"/>
 </project>
