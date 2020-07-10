@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+	<context:component-scan base-package="com"></context:component-scan>
+	<mvc:annotation-driven></mvc:annotation-driven>
+	<mvc:default-servlet-handler/>
+	<!-- 配置MyBatis：SqlSessionFactory -->
+	<!-- 第一步：配置连接池 -->
+	<!--DBCP连接池配置参数 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="oracle.jdbc.OracleDriver">
+		</property>
+		<property name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:orcl">
+		</property>
+		<property name="username" value="datang"></property>
+		<property name="password" value="123456"></property>
+	</bean>
+	
+	<!-- 第二步：配置SqlSessionFactory->工具：SqlSessionFactoryBean -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 加载Mybatis核心配置文件 -->
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+	</bean>
+	
+	<!-- 第三步：SqlSessionFactory.openSession()->SqlSessionTemplate -->
+	<!--创建sqlSession-->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+	
+	<!-- 配置事物管理器-〉SqlSession.commit()提交 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>	
+	</bean>
+
+</beans>
+
+
+
+
+
+
+
+
+

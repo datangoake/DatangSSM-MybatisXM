@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 导入dbcp连接池资源文件 -->
+	
+
+	<!-- 映射对应的表实体类 -->
+
+	
+	
+
+	
+	<!--映射DAO类配置文件 -->	
+	
+	<mappers>	
+		<mapper class= "com.newer.admin.data.dao.IEmployeeDAO"/>
+		<mapper class= "com.newer.admin.data.dao.IRoleDAO"/>
+		<mapper class= "com.newer.admin.data.dao.ITaskDao"/>
+	</mappers>
+</configuration>
