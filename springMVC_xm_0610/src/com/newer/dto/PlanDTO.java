@@ -7,7 +7,7 @@ public class PlanDTO {
 	String plan_name;//计划名称
 	String task_name;//所属任务
 	String begin_date_befor;//开始时间1
-	String begin_date_after;//开始时间1
+	String begin_date_after;//开始时间2
 	String end_date_befor;//结束时间1
 	String end_date_after;//结束时间2
 	String feedback_info;//是否反馈

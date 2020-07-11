@@ -17,5 +17,18 @@
 		<mapper class= "com.newer.admin.data.dao.IEmployeeDAO"/>
 		<mapper class= "com.newer.admin.data.dao.IRoleDAO"/>
 		<mapper class= "com.newer.admin.data.dao.ITaskDao"/>
+
+<mapper class="com.newer.mysm.data.dao.IempDAO"/>
+
+<mapper class="com.newer.mysm.data.dao.IPlanDAO"/>
+
+<mapper class="com.newer.mysm.data.dao.ITaskDAO"/>
+
+<mapper class="com.newer.mysm.data.dao.Tallyselectdao"/>
+
+
+
+
+<mapper class= "com.newer.mysm.data.dao.Tallyselectdao"/>
 	</mappers>
 </configuration>
